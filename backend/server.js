@@ -4,7 +4,9 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.js";
 import instructorRoutes from "./routes/instructor.js";
+
 import courseRoutes from "./routes/course.js";
+import studentRoutes from "./routes/student.js";
 // Load environment variables
 dotenv.config();
 
@@ -26,6 +28,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes); // login/register
 app.use("/api/instructor", instructorRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/student", studentRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {

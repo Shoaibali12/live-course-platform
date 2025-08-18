@@ -5,8 +5,9 @@ import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import Course from "../models/Course.js";
 import { authMiddleware, roleMiddleware } from "../middleware/auth.js";
+import PurchasedCourse from "../models/PurchasedCourse.js";
 import dotenv from "dotenv";
-
+import LiveSession from "../models/LiveSession.js";
 dotenv.config();
 
 const router = express.Router();
@@ -136,5 +137,91 @@ router.get(
     }
   }
 );
+// ✅ Get all students who purchased instructor's courses
+router.get(
+  "/students",
+  authMiddleware,
+  roleMiddleware("instructor"),
+  async (req, res) => {
+    try {
+      const instructorId = req.user.id;
 
+      const purchases = await PurchasedCourse.find()
+        .populate({
+          path: "course",
+          match: { instructor: instructorId }, // only this instructor’s courses
+        })
+        .populate("student", "name email"); // only select name + email
+
+      // Filter out null courses (if not owned by this instructor)
+      const students = purchases
+        .filter((p) => p.course !== null)
+        .map((p) => ({
+          studentId: p.student._id,
+          name: p.student.name,
+          email: p.student.email,
+          courseTitle: p.course.title,
+          paymentStatus: p.paymentStatus,
+          paymentId: p.paymentId,
+        }));
+
+      res.json({ success: true, students });
+    } catch (err) {
+      console.error("Error fetching students:", err);
+      res
+        .status(500)
+        .json({ success: false, error: "Failed to fetch students" });
+    }
+  }
+);
+
+// ✅ Create a live session
+router.post(
+  "/live/:courseId",
+  authMiddleware,
+  roleMiddleware("instructor"),
+  async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      const instructorId = req.user.id;
+
+      const roomUrl = `https://meet.jit.si/${courseId}-${Date.now()}`;
+
+      const session = new LiveSession({
+        course: courseId,
+        instructor: instructorId,
+        roomUrl,
+      });
+
+      await session.save();
+
+      res.json({ success: true, session });
+    } catch (err) {
+      console.error("Error creating live session:", err);
+      res
+        .status(500)
+        .json({ success: false, error: "Failed to create live session" });
+    }
+  }
+);
+
+// ✅ Get instructor’s live sessions
+router.get(
+  "/live",
+  authMiddleware,
+  roleMiddleware("instructor"),
+  async (req, res) => {
+    try {
+      const sessions = await LiveSession.find({
+        instructor: req.user.id,
+      }).populate("course");
+      res.json({ success: true, sessions });
+    } catch (err) {
+      console.error("Error fetching live sessions:", err);
+      res
+        .status(500)
+        .json({ success: false, error: "Failed to fetch live sessions" });
+    }
+  }
+);
 export default router;
