@@ -33,7 +33,7 @@ export default function LoginPage() {
 
         setTimeout(() => {
           if (data.user.role === "student") {
-            router.push("/student/dashboard");
+            router.push("/student/home");
           } else if (data.user.role === "instructor") {
             router.push("/instructor/dashboard");
           } else {
