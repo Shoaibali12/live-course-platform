@@ -23,10 +23,23 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
+      console.log(data.role);
+      console.log(data);
       if (res.ok) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.user.role);
+        localStorage.setItem("name", data.user.name); // ← add this
         setMessage("✅ Login successful!");
-        setTimeout(() => router.push("/dashboard"), 1000);
+
+        setTimeout(() => {
+          if (data.user.role === "student") {
+            router.push("/student/dashboard");
+          } else if (data.user.role === "instructor") {
+            router.push("/instructor/dashboard");
+          } else {
+            router.push("/dashboard"); // fallback
+          }
+        }, 1000);
       } else {
         setMessage(`❌ ${data.error || "Login failed"}`);
       }
@@ -38,16 +51,14 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-        {/* Heading */}
         <h1 className="text-3xl font-bold text-center text-blue-700 mb-6">
           Welcome Back
         </h1>
         <p className="text-center text-gray-500 mb-8">
-          Login to continue your learning journey with{" "}
+          Login to continue your journey with{" "}
           <span className="font-semibold">EduHub</span>
         </p>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -79,7 +90,6 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Message */}
           {message && (
             <p
               className={`text-sm text-center ${
@@ -90,7 +100,6 @@ export default function LoginPage() {
             </p>
           )}
 
-          {/* Button */}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-3 rounded-lg shadow hover:bg-blue-700 transition"
@@ -99,7 +108,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Footer */}
         <p className="mt-6 text-center text-gray-500 text-sm">
           Don’t have an account?{" "}
           <button
