@@ -89,29 +89,25 @@ router.post(
   roleMiddleware("instructor"),
   upload.single("material"),
   async (req, res) => {
-    try {
-      const course = await Course.findOne({
-        _id: req.params.id,
-        instructor: req.user._id,
-      });
+    const course = await Course.findOne({
+      _id: req.params.id,
+      instructor: req.user._id,
+    });
 
-      if (!course) return res.status(404).json({ error: "Course not found" });
+    if (!course) return res.status(404).json({ error: "Course not found" });
 
-      if (!req.file) {
-        return res.status(400).json({ error: "Material file is required" });
-      }
-
-      course.materials.push({
-        fileName: req.file.originalname,
-        fileUrl: req.file.path, // ✅ already Cloudinary URL
-      });
-
-      await course.save();
-
-      res.json({ message: "Material added successfully", course });
-    } catch (err) {
-      res.status(500).json({ error: err.message });
+    if (!req.file) {
+      return res.status(400).json({ error: "Material file is required" });
     }
+
+    course.materials.push({
+      fileName: req.file.originalname, // ✅ original name
+      fileUrl: req.file.path, // ✅ Cloudinary URL
+    });
+
+    await course.save();
+
+    res.json({ message: "Material added successfully", course });
   }
 );
 
