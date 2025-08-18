@@ -11,10 +11,11 @@ const courseSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    imageUrl: { type: String }, // ✅ Add this line
     materials: [
       {
         fileName: String,
-        fileKey: String,
+        fileUrl: String, // ✅ change from fileKey → fileUrl
         uploadedAt: { type: Date, default: Date.now },
       },
     ],

@@ -36,7 +36,7 @@ router.post(
   "/courses",
   authMiddleware,
   roleMiddleware("instructor"),
-  upload.single("image"), // course thumbnail upload
+  upload.single("image"),
   async (req, res) => {
     try {
       const { title, description, price } = req.body;
@@ -45,12 +45,14 @@ router.post(
         return res.status(400).json({ error: "Course image is required" });
       }
 
+      console.log("Uploaded file:", req.file); // 🔍 Debug
+
       const course = await Course.create({
         title,
         description,
         price,
         instructor: req.user._id,
-        imageUrl: req.file.path, // Cloudinary URL
+        imageUrl: req.file.path, // ✅ Cloudinary URL
       });
 
       res.status(201).json({ message: "Course created successfully", course });
@@ -100,7 +102,7 @@ router.post(
 
       course.materials.push({
         fileName: req.file.originalname,
-        fileUrl: req.file.path, // Cloudinary URL
+        fileUrl: req.file.path, // ✅ already Cloudinary URL
       });
 
       await course.save();
