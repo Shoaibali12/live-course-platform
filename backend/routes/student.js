@@ -1,7 +1,7 @@
 import express from "express";
 import Course from "../models/Course.js";
 import PurchasedCourse from "../models/PurchasedCourse.js";
-import { authMiddleware } from "../middleware/auth.js";
+import { authMiddleware, roleMiddleware } from "../middleware/auth.js";
 import { v4 as uuidv4 } from "uuid";
 
 const router = express.Router();
@@ -79,5 +79,31 @@ router.get("/my-courses", authMiddleware, async (req, res) => {
     res.status(500).json({ error: "Failed to fetch purchased courses" });
   }
 });
+
+// Get materials of a purchased course
+router.get(
+  "/courses/:id/materials",
+  authMiddleware,
+  roleMiddleware("student"),
+  async (req, res) => {
+    try {
+      const studentId = req.user.id;
+      const purchase = await PurchasedCourse.findOne({
+        student: studentId,
+        course: req.params.id,
+      }).populate("course");
+
+      if (!purchase)
+        return res
+          .status(403)
+          .json({ error: "You have not purchased this course" });
+
+      res.json(purchase.course.materials);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Server error" });
+    }
+  }
+);
 
 export default router;
