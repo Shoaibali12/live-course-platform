@@ -61,13 +61,13 @@ export default function MyCourses() {
               {/* Quick Links */}
               <div className="mt-3 space-x-2">
                 <Link
-                  href={`/student/course/${course._id}/materials`}
+                  href={`/student/courses/${course._id}/materials`}
                   className="text-blue-600 hover:underline text-sm"
                 >
                   Materials
                 </Link>
                 <Link
-                  href={`/student/course/${course._id}/live`}
+                  href={`/student/courses/${course._id}/live`}
                   className="text-blue-600 hover:underline text-sm"
                 >
                   Live Session

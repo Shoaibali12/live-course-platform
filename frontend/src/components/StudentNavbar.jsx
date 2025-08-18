@@ -44,7 +44,7 @@ export default function Navbar() {
           {menuOpen && (
             <div className="absolute right-0 mt-2 w-40 bg-white shadow rounded z-50">
               <Link
-                href="/student/dashboard"
+                href="/student/home"
                 className="block px-4 py-2 hover:bg-gray-100"
               >
                 My Courses
