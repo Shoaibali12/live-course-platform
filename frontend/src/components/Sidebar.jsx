@@ -8,8 +8,6 @@ const navItems = [
   { name: "Uploads", href: "/instructor/uploads" },
   { name: "Live Stream", href: "/instructor/live" },
   { name: "Students", href: "/instructor/students" },
-  { name: "Payments", href: "/instructor/payments" },
-  { name: "Settings", href: "/instructor/settings" },
 ];
 
 export default function Sidebar() {

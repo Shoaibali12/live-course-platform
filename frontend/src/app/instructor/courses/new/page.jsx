@@ -8,25 +8,27 @@ export default function NewCoursePage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false); // 👈 loading state
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // start loading
 
     try {
       const formData = new FormData();
       formData.append("title", title);
       formData.append("description", description);
       formData.append("price", price);
-      formData.append("image", image); // 👈 must match `upload.single("image")`
+      formData.append("image", image);
 
       const token = localStorage.getItem("token");
 
       const res = await fetch("http://localhost:5000/api/instructor/courses", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // 👈 required for authMiddleware
+          Authorization: `Bearer ${token}`,
         },
-        body: formData, // 👈 no need for JSON.stringify
+        body: formData,
       });
 
       if (!res.ok) throw new Error("Failed to create course");
@@ -34,10 +36,12 @@ export default function NewCoursePage() {
       const data = await res.json();
       console.log("✅ Course created:", data);
 
-      router.push("/instructor/courses"); // redirect to courses list
+      router.push("/instructor/courses");
     } catch (err) {
       console.error(err);
       alert("Error: " + err.message);
+    } finally {
+      setLoading(false); // stop loading
     }
   };
 
@@ -51,12 +55,14 @@ export default function NewCoursePage() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="border p-2 w-full"
+          required
         />
         <textarea
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="border p-2 w-full"
+          required
         />
         <input
           type="number"
@@ -64,18 +70,23 @@ export default function NewCoursePage() {
           value={price}
           onChange={(e) => setPrice(e.target.value)}
           className="border p-2 w-full"
+          required
         />
         <input
           type="file"
           accept="image/*"
           onChange={(e) => setImage(e.target.files[0])}
           className="border p-2 w-full"
+          required
         />
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className={`px-4 py-2 rounded text-white ${
+            loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600"
+          }`}
+          disabled={loading}
         >
-          Create Course
+          {loading ? "Creating..." : "Create Course"}
         </button>
       </form>
     </div>

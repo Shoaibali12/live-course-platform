@@ -1,40 +1,35 @@
 "use client";
-import { useRouter } from "next/navigation";
 
-export default function CourseCard({ course, showPurchase }) {
-  const router = useRouter();
-
+export default function CourseCard({
+  course,
+  showPurchase,
+  onPurchase,
+  disabled,
+}) {
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition">
-      <img
-        src={course.imageUrl}
-        alt={course.title}
-        className="rounded-md w-full h-40 object-cover"
-      />
-      <h3 className="text-lg font-semibold mt-2">{course.title}</h3>
-      <p className="text-sm text-gray-500">
-        By {course.instructor?.name || "Instructor"}
-      </p>
-      <p className="text-blue-600 font-bold mt-1">
+    <div className="border rounded-lg shadow-md p-4 bg-white">
+      {course.imageUrl && (
+        <img
+          src={course.imageUrl}
+          alt={course.title}
+          className="w-full h-40 object-cover rounded-md mb-3"
+        />
+      )}
+      <h2 className="text-lg font-semibold">{course.title}</h2>
+      <p className="text-sm text-gray-600">{course.instructor?.name}</p>
+      <p className="text-md font-bold mt-2">
         {course.price > 0 ? `$${course.price}` : "Free"}
       </p>
 
-      <div className="flex gap-2 mt-3">
+      {showPurchase && (
         <button
-          onClick={() => router.push(`/student/course/${course._id}`)}
-          className="bg-gray-200 px-3 py-1 rounded-md text-sm"
+          onClick={onPurchase}
+          disabled={disabled}
+          className="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
         >
-          View
+          {disabled ? "Processing..." : "Purchase"}
         </button>
-        {showPurchase && (
-          <button
-            onClick={() => router.push(`/student/checkout/${course._id}`)}
-            className="bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
-          >
-            Purchase
-          </button>
-        )}
-      </div>
+      )}
     </div>
   );
 }
